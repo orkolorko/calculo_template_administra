@@ -1,0 +1,169 @@
+\documentclass[10pt,brazil,a4paper]{article}
+% !TeX encoding=utf8
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{ae,aecompl}
+\usepackage{calc}
+\usepackage{forloop}
+\usepackage{etoolbox}
+\usepackage{geometry}
+\geometry{a4paper,tmargin=15mm,bmargin=15mm,lmargin=27mm,rmargin=17mm}
+\pagestyle{plain}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{amsmath}
+% impedir o underfull hbox
+\hbadness=10000
+\renewcommand{\baselinestretch}{1.3}
+
+\makeatletter
+
+\usepackage[brazil]{babel}
+\parindent=0pt
+
+\newlength{\colunaa}
+\setlength{\colunaa}{120mm}
+\newlength{\colunac}
+\setlength{\colunac}{30mm}
+\newlength{\colunab}
+\setlength{\colunab}{\textwidth-\colunaa-\colunac-7pt}
+
+% controla o numero de questoes e tambem se imprime todas as folhas ou so o cabecalho.
+\newbool{variasfolhas}
+\setboolean{variasfolhas}{true}
+\newcounter{numquestoes}
+\setcounter{numquestoes}{5}
+\newcounter{numfolhas}
+\setcounter{numfolhas}{5}
+\newcounter{subitensmultiplaescolha}
+\setcounter{subitensmultiplaescolha}{10}
+
+%comandos padrao, nao precisam ser alterados
+\newcounter{auxcontador}
+\newcounter{auxcont}
+\newcounter{auxsub}
+\setcounter{auxsub}{\value{subitensmultiplaescolha}}
+\addtocounter{auxsub}{1}
+\newcommand{\geralabel}[4]{
+  \ifstrequal{#2}{2}
+     { 
+         \textbf #1$^{\mathrm{\underline a}}$ \textbf{QUESTÃO} 
+     }
+     {
+       \begin{minipage}[T][18mm][b]{\colunaa} #3 \hfill \vfill 
+          \ifstrequal{#2}{0}
+          { 
+             \textbf #1$^{\mathrm{\underline a}}$ \textbf{QUESTÃO}
+          }{}
+          \ifstrequal{#2}{1}
+          {
+             \textbf #1$^{\mathrm{\underline a}}$ \textbf{QUESTÃO} \textbf{(CONTINUAÇÃO)}
+          }{}
+          \ifstrequal{#2}{3}
+          {
+             \textbf{CONTINUAÇÃO DA QUESTÃO \fbox{\qquad\vphantom{A}}}
+          }{}
+       \end{minipage} 
+       \begin{minipage}[T][18mm][b]{\colunab} \hfill \phantom{100} \vfill \hfill 
+            \ifstrequal{#2}{0}
+            {
+                \textbf{NOTA:}
+            }{}
+       \end{minipage} 
+       \begin{minipage}[T][18mm][b]{\colunac} \hfill #4 \vfill \hfill 
+            \ifstrequal{#2}{0}
+            {
+                \phantom{A}\fbox{\parbox{\colunac-4mm}{\quad \hfill \\ \quad \hfill}}
+            }{}
+       \end{minipage}
+   }
+   }
+
+
+% o comando labelquestao so deve ser editado quando pretende-se colocar mais de 
+% uma folha para a resolucao de uma questao (ocorre com alguma frequencia no
+% calculo iv.  Se isto for necessario, acerte os parametros do geralbabel da
+%sequinte forma:
+
+% O primeiro parametro do geralabel é o num. da questao a ser impresso no 
+% caderno de provas (se houver questao usando mais de uma folha, o mesmo 
+% numero de questao deve aparecer em mais de uma folha).
+% O segundo parametro do geralabel indica como deve aparecer a questao na
+% folha.
+% - Se for 0 indica que deve aparecer o numero da questao e a nota da
+%   questao.  Esta eh a situacao mais comum.
+% - Se for 1, indica que deve aparecer somente o numero da questao, sem a
+%   nota. Isto corresponde a uma folha de continuacao para a questao.
+% - Se for 2, imprime somente o numero da questao, mas nao imprime que eh 
+%   continuacao.  Deve ser empregado na primeira questao e somente nela. 
+% - Se for 3, imprime uma folha de continuação caso se acredite que necessita
+%   de mais de uma folha para a prova.
+\newcommand{\labelquestao}[3] { 
+   \ifthenelse{\equal{#1}{1}}{\geralabel{1}{2}{#2}{#3}}{}
+   \ifthenelse{\equal{#1}{2}}{\geralabel{2}{0}{#2}{#3}}{}
+   \ifthenelse{\equal{#1}{3}}{\geralabel{3}{0}{#2}{#3}}{}
+   \ifthenelse{\equal{#1}{4}}{\geralabel{4}{0}{#2}{#3}}{}
+   \ifthenelse{\equal{#1}{5}}{\geralabel{5}{0}{#2}{#3}}{}
+   \ifthenelse{\equal{#1}{6}}{\geralabel{6}{0}{#2}{#3}}{}
+   \ifthenelse{\equal{#1}{7}}{\geralabel{7}{0}{#2}{#3}}{}
+   \ifthenelse{\equal{#1}{8}}{\geralabel{8}{0}{#2}{#3}}{}
+   \ifthenelse{\equal{#1}{9}}{\geralabel{9}{0}{#2}{#3}}{}
+} 
+
+
+\ifthenelse{\value{numquestoes}>\value{numfolhas}}{\setcounter{numfolhas}{\value{numquestoes}}}{}
+% parametros  NUMAL, NUMPROVA, NOMEDISC, datacompleta, NOMETURM, NOMESALA, NOMEDOALUNO, DREAL   
+\newcommand{\GeraProva}[8] {    
+\setcounter{page}{1}
+{\Large \textbf INSTITUTO DE MATEMÁTICA } \\
+{\Large \textbf Universidade Federal do Rio de Janeiro \hfill #1}
+\vspace{+3mm}\hrule
+\begin{center} 
+   {\textbf{#2 de #3}} \\
+   {\textbf{#4}}
+\end{center} 
+\vspace{5mm} 
+{
+   \setlength{\colunac}{35mm}
+   \setlength{\colunaa}{\textwidth-\colunac-4pt}
+   \begin{minipage}[b]{\colunaa}
+      NOME:\quad #7 \qquad \qquad \\
+      ASSINATURA:\quad \dotfill \qquad \qquad \\
+      DRE:\quad #8 \hfill TURMA:\quad #5 \hfill SALA:\quad #6 \qquad \qquad \\
+      CORREIO ELETRÔNICO:\quad \dotfill \qquad \qquad
+   \end{minipage}
+   \begin{minipage}[c][35mm][c]{\colunac}
+   { \large   
+   \setcounter{auxcontador}{0}
+   \begin{flushright}
+   \whiledo{\value{auxcontador}<\value{numquestoes}} {
+        \setcounter{auxcontador}{\value{auxcontador}+1}
+        \hfill\textbf{\phantom{no}Q\theauxcontador:}  \framebox[\colunac-15mm]{\huge\vphantom{A}}\\ 
+        \ifthenelse{\value{auxcontador}=\value{numquestoes}} {
+        \vspace{2mm} { \textbf{Nota da prova:} } \\
+        \hfill \framebox[\colunac-5mm]{\Huge\vphantom{A}}\\}{}
+        }
+   \end{flushright}
+        }
+\end{minipage} }
+\ifthenelse{\boolean{variasfolhas}}
+{
+\vspace{8mm} 
+   {\labelquestao{\thepage}{#8}{#1}}
+\vfill
+\newpage
+\setcounter{auxcontador}{2}
+\whiledo{\not{\value{auxcontador}>\value{numfolhas}}}
+{
+\vspace{3mm} 
+\labelquestao{\thepage}{#8}{#1}
+\vfill
+\newpage
+\setcounter{auxcontador}{\value{auxcontador}+1}
+} 
+}{}
+}
+\setboolean{variasfolhas}{true}
+\begin{document}
+\GeraProva{NUMAL}{NUMPROVA}{NOMEDISC}{DIAM de MESAN de NUMAN}{NOMETURM}{NOMESALA}{NOMEDOALUNO}{DREAL}   
+\end{document}
